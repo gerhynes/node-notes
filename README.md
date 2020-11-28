@@ -97,3 +97,45 @@ You can skip the first two params using `slice` on `argv`.
 ```js
 const args = process.argv.slice(2);
 ```
+
+### Outputting to the command line
+
+Node includes a `console` module which gives you useful ways to interact with the command line (basically the same as the `console` object in the browser).
+
+The most common method is `console.log()` which prints a string to the console.
+
+You can format this by passing in variables and a format specifier.
+
+```js
+console.log("My %s is %d years old", "dog", 7);
+```
+
+- `%s` formats a variable as a string
+- `%d` formats a variable as a number
+- `%i` formats a variable as its integer part only
+- `%o` formats a variable as an object
+
+`console.log` prints the standard output, `stdout`, while `console.error` prints the `stderr` stream instead.
+
+`console.trace()` will print the stack trace of a function showing you how you reached that part of the code.
+
+You can use `time()` and `timeEnd()` to calculate how much time a function takes to run.
+
+```js
+const doSomething = () => console.log("test");
+const measureDoingSomething = () => {
+  console.time("doSomething()");
+  //do something, and measure the time it takes
+  doSomething();
+  console.timeEnd("doSomething()");
+};
+measureDoingSomething();
+```
+
+You can colour the text in the console using escape sequences, a set of characters which identify a colour.
+
+```js
+console.log("\x1b[33m%s\x1b[0m", "hi!");
+```
+
+You can also use packages such as [Chalk](https://github.com/chalk/chalk) or [Progress](https://github.com/visionmedia/node-progress) to style your output or create a progress bar in the console.
