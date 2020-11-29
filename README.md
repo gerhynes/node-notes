@@ -139,3 +139,92 @@ console.log("\x1b[33m%s\x1b[0m", "hi!");
 ```
 
 You can also use packages such as [Chalk](https://github.com/chalk/chalk) or [Progress](https://github.com/visionmedia/node-progress) to style your output or create a progress bar in the console.
+
+### Accepting input from the command line
+
+Since version 7, Node has provided the `readline` module which gets input from a readable stream, such as the `process.stdin` stream, and shows the input to the terminal one line at a time.
+
+The code below asks for a username, and once the text is entered and the user presses enter, shows a greeting.
+
+```js
+const readline = require("readline").createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+readline.question(`What's your name?`, (name) => {
+  console.log(`Hi ${name}!`);
+  readline.close();
+});
+```
+
+You can create more complex interactions, with multiple choice questions, confirmation, and more, using a package such as `Inquirer.js`.
+
+### The Module System
+
+A Node file can import functionality that is exposed by another Node file using `require()`.
+
+Functionality must be exposed before it can be imported by other files. This is what the `module.exports` API does.
+
+When you assign an object or function as an `exports` property, you expose it and allow it to be imported to other parts of the app, or other apps entirely.
+
+You can assign an object to `module.exports` (an item provided by the module system), and your file will export just that object.
+
+```js
+const book = {
+  title: "The Lord of the Rings",
+  author: "J.R.R. Tolkien"
+};
+
+module.exports = book;
+
+// in the other file
+const book = require("./book");
+```
+
+Or you can add the exported object as a property on `exports`. This lets you export multiple objects, functions or data.
+
+```js
+const book = {
+  title: "The Lord of the Rings",
+  author: "J.R.R. Tolkien"
+};
+
+exports.book = book;
+
+// in the other file
+const items = require("./items");
+item.book;
+```
+
+`module.exports` exposes the object it points to.
+
+`exports` exposes the properties of the object it points to.
+
+## npm
+
+npm, the standard package manager for Node, manages dependencies for your application installing them in the `node-modules` folder and keeping track of them in the `package.json` file.
+
+Adding the `--save` flag adds the package to the `package.json` file `dependencies`, while adding the `--save-dev` adds the package to the `devDependencies`. `devDependencies` are usually development tools, while `dependencies` are bundled with the app in production.
+
+npm lets you specify which version of a package to use. Sometimes a library is only compatible with a major release of another library. Or a bug in the latest release of a library causes issues and you want to wait for a fix before upgrading.
+
+The `package.json` lets you specify command line tasks, such as running a bundler, you can run using a script.
+
+```js
+{
+  "scripts": {
+    "watch": "webpack --watch --progress --colors --config webpack.conf.js",
+    "dev": "webpack --progress --colors --config webpack.conf.js",
+    "prod": "NODE_ENV=production webpack -p --config webpack.conf.js",
+  },
+}
+```
+
+By default, npm installs packages locally in the `node_modules` folder of the current project. Packages can be installed globally using the `-g` flag.
+
+Once installed a package can be imported into your programme using `require`.
+
+```js
+const _ = require("lodash");
+```
