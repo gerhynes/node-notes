@@ -228,3 +228,37 @@ Once installed a package can be imported into your programme using `require`.
 ```js
 const _ = require("lodash");
 ```
+
+### package.json
+
+The `package.json` file is a manifest (of sorts) for your project. It can contain properties describing the project, from name, version and repository to licence, contributors and issues. It's also the central repository for the configuration of tools.
+
+### package-lock.json
+
+The `package-lock.json` file (added in version 5 of npm) keeps track of the exact version of every package that's installed so that the project can be reproduced exactly.
+
+The dependencies in `package-lock.json` are updated when you run `npm update`.
+
+The `package.json` sets which versions you want to upgrade to (patch or minor), using semver notation.
+
+- Writing ~0.13.0 will only update patch releases: 0.13.1 is ok, but 0.14.0 is not.
+- Writing ^0.13.0, will update patch and minor releases: 0.13.1, 0.14.0 and so on.
+- Writing 0.13.0 is the exact version that will always be used.
+
+`npm list` will show the latest versions of all installed npm packages, including their dependencies.
+
+`npm list --depth=0` will only show the top-level packages, not their dependencies.
+
+You can install a specific version of an npm package using:
+
+```js
+npm install <package>@<version>
+```
+
+`npm view <package> versions` will list all previous versions of a package.
+
+When you install a package using `npm install <packagename>` the latest available version is downloaded, and it's entry is added to the `package.json` and `package-lock.json`.
+
+To find new releases for packages, run `npm outdated`.
+
+To update to a new major version of all packages, install the `npm-check-updates` package globally, then run `ncu -u` to upgrade the version hints in the `package.json`. Now run `npm update`.
