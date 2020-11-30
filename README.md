@@ -290,3 +290,29 @@ The rules about updating packages are shown through symbols:
 - `||` you combine sets. For example, `< 2.1 || > 2.6`
 
 If there's no symbol, you accept only the specified version.
+
+### Uninstalling packages
+
+Use `npm uninstall` to remove a package from `node_modules`. Add the `-S`/`--save` or `-D`/`--save-dev` to also remove the reference to it in `package.json`.
+
+### Local or global package installation
+
+In general packages should be installed locally to prevent compatibility issues.
+
+A package should be installed globally when it provides an executable command that you run from the CLI
+
+### npm dependencies and devDependencies
+
+Adding `-D`/`--save-dev` when installing packages saves them to `devDependencies` in the `package.json`.
+
+Development dependencies are intended for development-only tools, like testing libraries, bundlers, or transpilers.
+
+To only install production dependencies use `npm install --production`.
+
+### npx
+
+npx is a package runner that lets you run code built with Node and published through npm.
+
+npx lets you run executable commands without knowing the exact path or requiring the package to be installed globally.
+
+npx also lets you run commands without first installing them, such as `create-react-app`.
