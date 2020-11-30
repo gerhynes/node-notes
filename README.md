@@ -242,7 +242,7 @@ The dependencies in `package-lock.json` are updated when you run `npm update`.
 The `package.json` sets which versions you want to upgrade to (patch or minor), using semver notation.
 
 - Writing ~0.13.0 will only update patch releases: 0.13.1 is ok, but 0.14.0 is not.
-- Writing ^0.13.0, will update patch and minor releases: 0.13.1, 0.14.0 and so on.
+- Writing ^0.13.0 will update patch and minor releases: 0.13.1, 0.14.0 and so on.
 - Writing 0.13.0 is the exact version that will always be used.
 
 `npm list` will show the latest versions of all installed npm packages, including their dependencies.
@@ -262,3 +262,31 @@ When you install a package using `npm install <packagename>` the latest availabl
 To find new releases for packages, run `npm outdated`.
 
 To update to a new major version of all packages, install the `npm-check-updates` package globally, then run `ncu -u` to upgrade the version hints in the `package.json`. Now run `npm update`.
+
+### Semantic Versioning in npm
+
+npm packages use semantic versioning for their version numbering.
+
+All versions have three digits for major version, minor version, and patch version, for example, `2.24.91`.
+
+The rules about updating packages are shown through symbols:
+
+- `^` you accept patch and minor releases. For example, from `^1.13.0` to `1.13.1` or `1.14.0`
+
+- `~` you accept patch releases. For example, from `~0.13.0` to `0.13.1` but not `0.14.0`
+
+- `>` you accept any version higher than the one you specify
+
+- `>=` you accept any version equal to or higher than the one you specify
+
+- `<=` you accept any version equal to or lower than the one you specify
+
+- `<` you accept any version lower than the one you specify
+
+- `=` you accept that exact version
+
+- `-` you accept a range of versions. For example, `2.1.0 - 2.6.2`
+
+- `||` you combine sets. For example, `< 2.1 || > 2.6`
+
+If there's no symbol, you accept only the specified version.
