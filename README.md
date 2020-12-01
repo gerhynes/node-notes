@@ -316,3 +316,29 @@ npx is a package runner that lets you run code built with Node and published thr
 npx lets you run executable commands without knowing the exact path or requiring the package to be installed globally.
 
 npx also lets you run commands without first installing them, such as `create-react-app`.
+
+## The Node Event Loop
+
+The JavaScript code run by Node runs on a single thread. There is just one thing happening at a time.
+
+This is a helpful limitation as it simplifies programmes and avoids concurrency issues.
+
+You need to write Node code to avoid anything that could block the thread, like synchronous network calls or infinite loops.
+
+In most browsers, there is an event loop for every browser tab to prevent heavy processing from blocking the entire browser.
+
+Any JavaScript code that takes too long to return back control to the event loop will block the execution of any JavaScript code on the page, even blocking the UI thread, and the user will not be able to click around, scroll the page, and so on.
+
+Almost all I/O primitives in JavaScript, such as network requests or filesystem operations, are non-blocking. Being blocking is the exception. This is why JavaScript has been based so much on callbacks and more recently async/await.
+
+### The call stack
+
+The JavaScript call stack is a last in/first out queue.
+
+The event loop continuously checks the call stack to see if there's any function that needs to run. It adds any function it finds to the call stack and executes each one in order.
+
+### The message queue
+
+The message queue is a list of messages to be processed. A callback function triggered by `setTimeout` is placed here, as are user-initiated events like clicks or keyboard events, as well as fetch responses.
+
+The event loop gives priority to the call stack, and first processes everything it finds there, then it picks up things from the message queue.
