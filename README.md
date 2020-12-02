@@ -342,3 +342,31 @@ The event loop continuously checks the call stack to see if there's any function
 The message queue is a list of messages to be processed. A callback function triggered by `setTimeout` is placed here, as are user-initiated events like clicks or keyboard events, as well as fetch responses.
 
 The event loop gives priority to the call stack, and first processes everything it finds there, then it picks up things from the message queue.
+
+### ES6 job queue
+
+ES6 introduced the job queue, which is used by Promises. This executes the result of an async funcion as soon as possible rather than putting it at the end of the call stack.
+
+Promises that resolve before the current function ends will be executed right after the current function.
+
+This is a big difference between Promsies (and Async/Await, which is built on Promises) and older asynchronous function through `setTimeout` or other browser APIs.
+
+### process.nextTick()
+
+A tick is every time the event loop takes a full trip.
+
+If you pass a function to `process.nextTick()`, you are telling the JavaScript engine to invoke this function at the end of the current operation, before the nect event loop tick starts.
+
+This is how you tell the JavaScript engine to process a function asynchronously, after the current fucntion but as soon as possible, without queueing it.
+
+For example, calling `setTimeout(() => {}, 0)` will execute the function at the end of the next tick, much later than `nextTick()`, which prioritizes the call and executes it just before the beginning of the next tick.
+
+Use `nextTick()` when you want to make sure that your code is already executed when the next event loop iteration runs.
+
+### setImmediate()
+
+When you want to execute some code asynchronously, but as soon as possible, you can use `setImmediate()`.
+
+Any function passed as the argument to `setImmediate()` is a callback that's executed in the next iteration of the event loop.
+
+Unlike `process.netTick()`, which is executed on the current iteration of the event loop (after the current operation ends), `setImmediate()` will run in the next iteration of the event loop.
