@@ -370,3 +370,87 @@ When you want to execute some code asynchronously, but as soon as possible, you 
 Any function passed as the argument to `setImmediate()` is a callback that's executed in the next iteration of the event loop.
 
 Unlike `process.netTick()`, which is executed on the current iteration of the event loop (after the current operation ends), `setImmediate()` will run in the next iteration of the event loop.
+
+## JavaScript Timers
+
+### setTimeout
+
+`setTimeout` lets you specify a callback function to execute after a specific amount of time.
+
+```js
+setTimeout(() => {
+  // Do something after 2 seconds
+}, 2000);
+
+setTimeout(myFunction, 2000, firstParam, secondParam);
+```
+
+`setTimeout` returns the timer id. This can be stored and cleared if you want to delete the scheduled function execution.
+
+```js
+const id = setTimeout(() => {
+  // Do something after 2 seconds
+}, 2000);
+
+clearTimeout(id);
+```
+
+If you set the timeout delay to 0, the callback function will be executed as soon as possible, but after the current function execution.
+
+This can be useful to avoid blocking the CPU on intensive tasks and let other functions be executed while performing a heavy calculation, by queuing functions in the scheduler.
+
+```js
+setTimeout(() => {
+  console.log("after "); // runs second
+}, 0);
+
+console.log(" before "); // runs first
+```
+
+### setInterval
+
+`setInterval` is similar to `setTimeout` but instead of running the callback function once, it will run forever at the specified interval.
+
+```js
+setInterval(() => {
+  // runs every 2 seconds
+}, 2000);
+```
+
+You can stop the function by passing the interval id returned from `setInterval` to `clearInterval`.
+
+```js
+const id = setInterval(() => {
+  // runs every 2 seconds
+}, 2000);
+
+clearInterval(id);
+```
+
+It's common to call `clearInterval` inside the `setInterval` callback function, to let it determine if it should run again or stop based off a conditional.
+
+```js
+const interval = setInterval(() => {
+  if (App.somethingIWaitFor === "arrived") {
+    clearInterval(interval);
+    return;
+  }
+  // otherwise do things
+}, 100);
+```
+
+### Recursive setTimeout
+
+`setInterval` starts a function every n milliseconds, without any consideration of when the function finishes its execution.
+
+One long execution could overlap the next one, causing issues. To prevent this, you can schedule a recursive `setTimeout` to be called when the callback function finishes. This maintains a regular interval between executions.
+
+```js
+const myFunction = () => {
+  // do something
+
+  setTimeout(myFunction, 1000);
+};
+
+setTimeout(myFunction, 1000);
+```
