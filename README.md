@@ -454,3 +454,37 @@ const myFunction = () => {
 
 setTimeout(myFunction, 1000);
 ```
+
+## JavaScript Asynchronous Programming and Callbacks
+
+Computers are asynchronous be design.
+
+Things can happen independently of the main program flow. In most consumer computers, every program runs for a specific time slot and then stops its execution to let another program continue their execution. This happens in a cycle so far it's impossible to notice.
+
+Programs internally use interrupts, a signal that's emitted to the processor to gain the attention of the system.
+
+Most programming languages are synchronous by default. Some handle async by using threads and spawning new processes.
+
+JavaScript is synchronous by default and is single threaded. Lines of code are executed in a series, one after another. Code cannot create new threads and run in parallel.
+
+But JavaScript was also created for the browser where it had to respond to actions like `onClick`, `onMouseOver`, `onChange` and `onSubmit`.
+
+Browsers provided a set of APIs that could handle asynchronous functionality. Then, Node introduced a non-blocking I/O environment to extend this to things like file access and network calls.
+
+### Callbacks
+
+A callback is a simple function that's passed as a value to another function, and will be executed only when an event happens. JavaScript can do this because is has first-class function, which can be assigned to variables and passed around to other functions (called higher-order functions).
+
+For example, an event handler accepts a function, which will be called when the event is triggered.
+
+```js
+document.getElementById("button").addEventListener("click", () => {
+  //item clicked
+});
+```
+
+### Handling errors in callbacks
+
+One common strategy for handling errors in callbacks, which Node has adopted, is error-first callbacks, where the first parameter of the callback function is the error object.
+
+If there is no error, the object is `null`. If there is an error, it contains some description of the error and other information.
