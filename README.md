@@ -488,3 +488,47 @@ document.getElementById("button").addEventListener("click", () => {
 One common strategy for handling errors in callbacks, which Node has adopted, is error-first callbacks, where the first parameter of the callback function is the error object.
 
 If there is no error, the object is `null`. If there is an error, it contains some description of the error and other information.
+
+### The problem with callbacks
+
+Callbacks work great in simple situations. But every callback adds a level of nesting and can quickly make code difficult to read (callback hell)
+
+```js
+window.addEventListener("load", () => {
+  document.getElementById("button").addEventListener("click", () => {
+    setTimeout(() => {
+      items.forEach((item) => {
+        //your code here
+      });
+    }, 2000);
+  });
+});
+```
+
+## Promises
+
+A promise is a proxy for a value that will eventually become available.
+
+Async function use promises behind the scenes, so understanding promises is fundamental to understanding `async` and `await` too.
+
+When a promise is called, it starts in a pending state. The calling function continues executing, while the promsie is pending until it resolves, giving the calling function whatever data was requested.
+
+The promise will eventually end in either a resolved state or a rejected state, calling the callback functions passed to either `then` or `catch` upon finishing.
+
+### Creating a promise
+
+The Promise API exposes a Promise constructor, which you initialize using `new Promise()`.
+
+```js
+let done = true;
+
+const isItDoneYet = new Promise((resolve, reject) => {
+  if (done) {
+    const workDone = "Here is the thing I built";
+    resolve(workDone);
+  } else {
+    const why = "Still working on something else";
+    reject(why);
+  }
+});
+```
