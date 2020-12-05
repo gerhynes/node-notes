@@ -694,3 +694,77 @@ Promise.race([first, second]).then((result) => {
   console.log(result); // second
 });
 ```
+
+## Async/Await
+
+Async functions (introduced in ES2017) are a combination of promises and generators, and are essentially a higher level of abstraction over promises.
+
+Async/await reduces the boilerplate around promises and some of the limitations of chaining promises.
+
+Promises were introduced to solve callback hell but introduced some of their own complexity, especially around syntax.
+
+Async functions were built on top of promises to make code that looks synchronous but it's asynchronous and non-blocking behind the scenes.
+
+An async function returns a promise:
+
+```js
+const doSomethingAsync = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve("I did something"), 3000);
+  });
+};
+```
+
+When you want to call this function you must define the calling function as `async` and prepend `await` before the asynchronous function. The calling code will stop until the promise is resolved or rejected.
+
+Prepending the `async` keyword to a function means the function will return a promise. Even if it's not doing so explicitly, it will internally make it return a promise.
+
+```js
+const aFunction = async () => {
+  return "test";
+};
+aFunction().then(alert); // This will alert 'test'
+
+// is the same as
+
+const aFunction = async () => {
+  return Promise.resolve("test");
+};
+aFunction().then(alert); // This will alert 'test'
+```
+
+Async/await increases code readibility.
+
+Using promises:
+
+```js
+const getFirstUserData = () => {
+  return fetch("/users.json") // get users list
+    .then((response) => response.json()) // parse JSON
+    .then((users) => users[0]) // pick first user
+    .then((user) => fetch(`/users/${user.name}`)) // get user data
+    .then((userResponse) => userResponse.json()); // parse JSON
+};
+getFirstUserData();
+```
+
+Using async/await:
+
+```js
+const getFirstUserData = async () => {
+  const response = await fetch("/users.json"); // get users list
+  const users = await response.json(); // parse JSON
+  const user = users[0]; // pick first user
+  const userResponse = await fetch(`/users/${user.name}`); // get user data
+  const userData = await userResponse.json(); // parse JSON
+  return userData;
+};
+
+getFirstUserData();
+```
+
+Multiple async functions can be chained and the syntax is more readable than with plain promises.
+
+Async/await is also easier to debug. As far as the compiler's concerned, it's just like synchronous code.
+
+Debugging promises is harder because the debugger will not setp over asynchronous code.
