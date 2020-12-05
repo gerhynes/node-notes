@@ -532,3 +532,97 @@ const isItDoneYet = new Promise((resolve, reject) => {
   }
 });
 ```
+
+Here, the promise checks the `done` global constant. If it's true, the promise goes to a resolved state (since the `resolve` callback was called); otherwise, the `reject` callback is executed, putting the promise in a rejected state. If neither function is ever called in the execution path, the promise will remain in a pending state.
+
+Using `resolve` and `reject`, you can communicate back to the caller what the resulting promise state was and what to do with it.
+
+Another technique is Promisifying. Here a function takes a callback and has it return a promise.
+
+```js
+const fs = require("fs");
+
+const getFile = (fileName) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(fileName, (err, data) => {
+      if (err) {
+        reject(err); // calling `reject` will cause the promise to fail with or without the error passed as an argument
+        return; // and we don't want to go any further
+      }
+      resolve(data);
+    });
+  });
+};
+
+getFile("/etc/passwd")
+  .then((data) => console.log(data))
+  .catch((err) => console.error(err));
+```
+
+### Consuming a promise
+
+```js
+const isItDoneYet = new Promise(/* ... as above ... */);
+//...
+
+const checkIfItsDone = () => {
+  isItDoneYet
+    .then((ok) => {
+      console.log(ok);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+```
+
+Running `checkIfItsDone()` will specify functions to execute when the `isItDoneYet` promise resolves (in the `then` call) or rejects (in the `catch` call).
+
+### Chaining promises
+
+A promise can be returned to another promise, creating a chain of promises.
+
+A common example of chaining promises is the Fetch API, which can be used to get a resource and queue a chain of promises to execute when the resource is fetched.
+
+Calling `fetch()` is the equivalent of defining a promise using `new Promise()`.
+
+In this example, `fetch()` gets a list of TODO items from `todos.json` and creates a chain of promises.
+
+```js
+const status = (response) => {
+  if (response.status >= 200 && response.status < 300) {
+    return Promise.resolve(response);
+  }
+  return Promise.reject(new Error(response.statusText));
+};
+
+const json = (response) => response.json();
+
+fetch("/todos.json")
+  .then(status) // note that the `status` function is actually **called** here, and that it **returns a promise***
+  .then(json) // likewise, the only difference here is that the `json` function here returns a promise that resolves with `data`
+  .then((data) => {
+    // ... which is why `data` shows up here as the first parameter to the anonymous function
+    console.log("Request succeeded with JSON response", data);
+  })
+  .catch((error) => {
+    console.log("Request failed", error);
+  });
+```
+
+Running `fetch()` returns a response, and on its properties you can reference:
+
+- `status` a numeric value representing the HTTP status code
+- `statusText` a status message, which is `OK` if the request succeeded
+
+`response` has a `json()` method, which returns a promise that will resolve with the content of the the body processed and transfored into JSON.
+
+This is what happens:
+
+The first promise in the chain is a function called `status()`, which checks the response status and if it's not a success response (between 200 and 299), it rejects the promise.
+
+This will cause the promise chain to skip all the chained promises and skip directly to the `catch()` statement, logging the "Request failed" text along with the error messages.
+
+If instead the status is a success, it calls the `json()` function defined earlier. Since the previous promise, when successful, returned a `response` object, you get it as an input to the second promise.
+
+In this case, the data JSON is returned, so the third promise receives the JSON directly and logs it to the console.
