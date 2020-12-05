@@ -626,3 +626,71 @@ This will cause the promise chain to skip all the chained promises and skip dire
 If instead the status is a success, it calls the `json()` function defined earlier. Since the previous promise, when successful, returned a `response` object, you get it as an input to the second promise.
 
 In this case, the data JSON is returned, so the third promise receives the JSON directly and logs it to the console.
+
+### Handling errors
+
+When anything in the chain of promises fails and raises an erro or rejects the promise, the control goes to the nearest `catch()` statement down the chain.
+
+```js
+new Promise((resolve, reject) => {
+  throw new Error("Error");
+}).catch((err) => {
+  console.error(err);
+});
+
+// or
+
+new Promise((resolve, reject) => {
+  reject("Error");
+}).catch((err) => {
+  console.error(err);
+});
+```
+
+If inside the `catch()` you raise an error, you can append a second `catch()` to handle it.
+
+```js
+new Promise((resolve, reject) => {
+  throw new Error("Error");
+})
+  .catch((err) => {
+    throw new Error("Error");
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+### Promise.all()
+
+If you need to synchronize different promises, `Promise.all()` helps you to define a list of promises and execute something when they are all resolved.
+
+```js
+const f1 = fetch("/something.json");
+const f2 = fetch("/something2.json");
+
+Promise.all([f1, f2])
+  .then((res) => {
+    console.log("Array of results", res);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+### Promise.race()
+
+`Promise.race()` runs when the first of the promises you pass to it resolves. It runs the attached callback just once with the result of the first promise resolved.
+
+```js
+const first = new Promise((resolve, reject) => {
+  setTimeout(resolve, 500, "first");
+});
+const second = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, "second");
+});
+
+Promise.race([first, second]).then((result) => {
+  console.log(result); // second
+});
+```
