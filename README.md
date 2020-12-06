@@ -799,3 +799,99 @@ eventEmitter.on("start", (number) => {
 
 eventEmitter.emit("start", 23);
 ```
+
+## Building a HTTP Server
+
+```js
+const http = require("http");
+
+const port = process.env.PORT;
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/html");
+  res.end("<h1>Hello, World!</h1>");
+});
+
+server.listen(port, () => {
+  console.log(`Server running at port ${port}`);
+});
+```
+
+The `http` module allows you to create a server.
+
+The server is set to listen on a specified post. When the server is ready, the `listen` callback function is called.
+
+The callback function you pass is the one that's executed on every request that comes in. When a new request is received, the `request` event is called, providing two objects: a request (a `http.IncomingMessage` object) and a response (a `http.ServerResponse` object).
+
+`request` provides the request details, allowing you to access the request headers and data.
+
+`response` populates the data that's going to be returned to the client.
+
+In this example you set the statusCode property to 200, indicating a successful response, set the Content-Type header, and close the response, adding the content as an argument to `end()`.
+
+## Making HTTP requests with Node
+
+### Performing a GET request
+
+```js
+const https = require("https");
+const options = {
+  hostname: "whatever.com",
+  port: 443,
+  path: "/todos",
+  method: "GET"
+};
+
+const req = https.request(options, (res) => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on("data", (d) => {
+    process.stdout.write(d);
+  });
+});
+
+req.on("error", (error) => {
+  console.error(error);
+});
+
+req.end();
+```
+
+### Performing a POST request
+
+```js
+const https = require("https");
+
+const data = JSON.stringify({
+  todo: "Buy the milk"
+});
+
+const options = {
+  hostname: "whatever.com",
+  port: 443,
+  path: "/todos",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Content-Length": data.length
+  }
+};
+
+const req = https.request(options, (res) => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on("data", (d) => {
+    process.stdout.write(d);
+  });
+});
+
+req.on("error", (error) => {
+  console.error(error);
+});
+
+req.write(data);
+req.end();
+```
+
+PUT and DELETE requests use the same request format as POST, with the `options.method` value changed.
