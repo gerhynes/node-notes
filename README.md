@@ -895,3 +895,98 @@ req.end();
 ```
 
 PUT and DELETE requests use the same request format as POST, with the `options.method` value changed.
+
+### HTTP POST request
+
+There are multiple ways to make a HTTP POST request in Node at different levels of abstraction. One of the simplest is to use the library [Axios](https://github.com/axios/axios).
+
+```js
+const axios = require("axios");
+
+axios
+  .post("https://example.com/todos", {
+    todo: "Buy oat milk"
+  })
+  .then((res) => {
+    console.log(`statusCode: ${res.statusCode}`);
+    console.log(res);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+```
+
+A POST request using only the Node standard library is possible but more verbose:
+
+```js
+const https = require("https");
+
+const data = JSON.stringify({
+  todo: "Buy oat milk"
+});
+
+const options = {
+  hostname: "example.com",
+  port: 443,
+  path: "/todos",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Content-Length": data.length
+  }
+};
+
+const req = https.request(options, (res) => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on("data", (d) => {
+    process.stdout.write(d);
+  });
+});
+
+req.on("error", (error) => {
+  console.error(error);
+});
+
+req.write(data);
+req.end();
+```
+
+### Getting HTTP request body data
+
+If you are using Express, you can extract the data that was sent as JSOn in the request body using the `body-parser` module.
+
+```js
+const express = require("express");
+const app = express();
+
+app.use(
+  express.urlencoded({
+    extended: true
+  })
+);
+
+app.use(express.json());
+
+app.post("/todos", (req, res) => {
+  console.log(req.body.todo);
+});
+```
+
+With vanilla Node, when you initialize a HTTP server using `http.createServer`, the callback is called when the server got all the HTTP headers, but not the request body.
+
+The `request` object passed in the connection callback is a stream.
+
+You need to listen for the body content to be processed (which is processed in chunks) by listening to the stream `data` events and when the data ends, the stream `end` event is called.
+
+```js
+const server = http.createServer((req, res) => {
+  // we can access HTTP headers
+  req.on("data", (chunk) => {
+    console.log(`Data chunk available: ${chunk}`);
+  });
+  req.on("end", () => {
+    //end of data
+  });
+});
+```
