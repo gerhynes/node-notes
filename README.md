@@ -990,3 +990,40 @@ const server = http.createServer((req, res) => {
   });
 });
 ```
+
+### Working with file descriptors in Node
+
+Before being able to interact with a file on your filesystem, you need a file descriptor.
+
+A file descriptor is what's returned by opening the file using the `open()` method of the `fs` module.
+
+```js
+const fs = require("fs");
+
+fs.open("/Users/joe/test.txt", "r", (err, fd) => {
+  //fd is our file descriptor
+});
+```
+
+The `r` flag passed as a second parameter to the `fs.open()` call means you are opening the file for reading.
+
+Other common flags include:
+
+- `r+` opens the file for reading and writing
+- `w+` opens the file for reading and writing, positioning the stream at the beginning of the file. The file is created if it doesn't already exist.
+- `a` opens the file for writing, positioning the stream at the end of the file. The file is created if it doesn't already exist.
+- `a+` opens the file for reading and writing, positioning the stream at the end of the file. The file is created if it doesn't already exist.
+
+You can also open the file using the `fs.openSync` method, which returns the file descriptor, instead of providing it in a callback:
+
+```js
+const fs = require("fs");
+
+try {
+  const fd = fs.openSync("/Users/joe/test.txt", "r");
+} catch (err) {
+  console.error(err);
+}
+```
+
+Once you have the file descriptor, you can perform the operations that require it to interact with the filesystem, such as calling `fs.open()`.
