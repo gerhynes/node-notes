@@ -768,3 +768,34 @@ Multiple async functions can be chained and the syntax is more readable than wit
 Async/await is also easier to debug. As far as the compiler's concerned, it's just like synchronous code.
 
 Debugging promises is harder because the debugger will not setp over asynchronous code.
+
+## The Node Event emitter
+
+In the browser, much of the interaction of the user is handled through events, such as mouse clicks, mouse movements and button presses.
+
+On the back end, Node provides a similar system using the `events` module, in particular the `EventEmitter` class.
+
+This is initialized using:
+
+```js
+const EventEmitter = require("events");
+const eventEmitter = new EventEmitter();
+```
+
+This object exposes methods such as `emit` and `on`.
+
+- `emit()` is used to trigger an event
+- `on()` is used to add a callback function that will be executed when the event is triggered
+- `once()` adds a one-time listener
+- `removeListener()`/`off()` removes an event listener
+- `removeAllListeners()` removes all listeners for an event
+
+You can pass arguments to the event handler by passing them as additional arguments to `emit()`.
+
+```js
+eventEmitter.on("start", (number) => {
+  console.log(`started ${number}`);
+});
+
+eventEmitter.emit("start", 23);
+```
