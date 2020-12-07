@@ -1109,3 +1109,74 @@ fs.readFile("/Users/joe/test.txt", "utf8", (err, data) => {
 There is also a synchronous version, `readFileSync()`. Both versions read the full content of the file in memory before returning the data.
 
 This means that large files will have a significant impact on memory consumption and the speed of execution of the programme. It may be a better option to read the file content using streams.
+
+### Writing files with Node
+
+The most straightforward way to write files in Node is with the `fs.writeFile()` API.
+
+```js
+const fs = require("fs");
+
+const content = "Some content!";
+
+fs.writeFile("/Users/joe/test.txt", content, (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  //file written successfully
+});
+```
+
+By default, this API will replace the content of the file if it already exists.
+
+You can modify the API's defaults using flags:
+
+- `r+` opens the file for reading and writing
+- `w+` opens the file for reading and writing, positioning the stream at the beginning of the file. The file is created if it doesn't already exist.
+- `a` opens the file for writing, positioning the stream at the end of the file. The file is created if it doesn't already exist.
+- `a+` opens the file for reading and writing, positioning the stream at the end of the file. The file is created if it doesn't already exist.
+
+### Appending to a file
+
+The `fs.appendFild()` method is useful for appending content to a file.
+
+```js
+const content = "Some content to add!";
+
+fs.appendFile("file.log", content, (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  //done!
+});
+```
+
+The above methods write the full content of the file before returning the control back to your programme. It may be a better option to use streams to write the file content.
+
+### Working with folders in Node
+
+The `fs` module provides several methods for working with folders.
+
+`fs.access()` checks if a folder exists and if Node can access it with its permissions.
+
+`fs.mkdir()` creates a new folder.
+
+`fs.readdir` reads the contents of a folder.
+
+`fs.rename()` lets you rename a folder. Its first param is the current path and its second is the new path.
+
+```js
+const fs = require("fs");
+
+fs.rename("/Users/joe", "/Users/adam", (err) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  //done
+});
+```
+
+`fs.rmdir()` removes a folder. You may want to use the `remove()` method on the [`fs-extra` module](https://www.npmjs.com/package/fs-extra) instead.
