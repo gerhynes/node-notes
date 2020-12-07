@@ -1050,3 +1050,62 @@ The information you can extract includes:
 - if the file is a directory or a file, using `stats.isFile()` or `stats.isDirectory`
 - if the file is a symbolic link using `stats.isSymbolicLink()`
 - the file size in bytes using `stats.size`
+
+### File paths
+
+Every file in a system has a path, for example: `/users/joe/file.txt` or `C:\users\joe\file.txt`.
+
+The `path` module provides methods for working with paths, such as:
+
+- `dirname` gets the parent folder of a file
+- `basename` gets the filename part
+- `extname` gets the file extension
+
+```js
+const notes = "/users/joe/notes.txt";
+
+path.dirname(notes); // /users/joe
+path.basename(notes); // notes.txt
+path.extname(notes); // .txt
+```
+
+You can join two or more parts of a path using `path.join()`.
+
+```js
+const name = "joe";
+path.join("/", "users", name, "notes.txt"); //'/users/joe/notes.txt'
+```
+
+You can get the absolute path calculation of a relative path using `path.resolve()`.
+
+```js
+path.resolve("joe.txt"); //'/Users/joe/joe.txt' if run from my home folder
+```
+
+`path.normalize()` will try and calculate the actual path when it contains relative specifiers like `..` or `//`.
+
+```js
+path.normalize("/users/joe/..//test.txt"); ///users/test.txt
+```
+
+`path.resolve()` and `path.normalize()` won't check if a path exists. They only caluclate a path based on the information they received.
+
+### Reading files with Node
+
+The most straightforward way to read a file in Node is with the `fs.readFile()` method. You pass it a file path, an encoding and a callback function that will be called with the file data and any error.
+
+```js
+const fs = require("fs");
+
+fs.readFile("/Users/joe/test.txt", "utf8", (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log(data);
+});
+```
+
+There is also a synchronous version, `readFileSync()`. Both versions read the full content of the file in memory before returning the data.
+
+This means that large files will have a significant impact on memory consumption and the speed of execution of the programme. It may be a better option to read the file content using streams.
