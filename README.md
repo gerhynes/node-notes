@@ -1027,3 +1027,26 @@ try {
 ```
 
 Once you have the file descriptor, you can perform the operations that require it to interact with the filesystem, such as calling `fs.open()`.
+
+### Node file stats
+
+Every file comes with a set of details that can be inspected using Node, for example with the `stat()` method provided by the `fs` module.
+
+To run `stat()`, pass it a file path and it will call a callback function with two parameters, an error message and the file stats:
+
+```js
+const fs = require("fs");
+fs.stat("/Users/joe/test.txt", (err, stats) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  //you have access to the file stats in `stats`
+});
+```
+
+The information you can extract includes:
+
+- if the file is a directory or a file, using `stats.isFile()` or `stats.isDirectory`
+- if the file is a symbolic link using `stats.isSymbolicLink()`
+- the file size in bytes using `stats.size`
