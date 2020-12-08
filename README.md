@@ -1,4 +1,4 @@
-# Node Notes
+# Node notes
 
 Node.js is a JavaScript runtime environment which uses the V8 JavaScript engine (which powers Google Chrome) to run JavaScript outside the browser.
 
@@ -1180,3 +1180,65 @@ fs.rename("/Users/joe", "/Users/adam", (err) => {
 ```
 
 `fs.rmdir()` removes a folder. You may want to use the `remove()` method on the [`fs-extra` module](https://www.npmjs.com/package/fs-extra) instead.
+
+## The Node fs module
+
+The `fs` module provides ways to access and interact with the file system. It's part of Node core and can be accessed by requiring it.
+
+- `fs.access()` checks if the file exists and Node can access it with its permissions
+- `fs.appendFile()` appends data to a file. If the file doesn't exist, it's created
+- `fs.chmod()` changes the permissions of a file specified by the filename passed. Related: `fs.lchmod()`, `fs.fchmod()`
+- `fs.chown()` changes the owner and group of a file specified by the filename passed. Related: fs.fchown(), fs.lchown()
+- `fs.close()` closes a file descriptor
+- `fs.copyFile()` copies a file
+- `fs.createReadStream()` creates a readable file stream
+- `fs.createWriteStream()` creates a writable file stream
+- `fs.link()` creates a new hard link to a file
+- `fs.mkdir()` creates a new folder
+- `fs.mkdtemp()` creates a temporary directory
+- `fs.open()` sets the file mode
+- `fs.readdir()` reads the contents of a directory
+- `fs.readFile()` reads the content of a file. Related: `fs.read()`
+- fs.readlink() reads the value of a symbolic link
+- `fs.realpath()` resolves relative file path pointers (., ..) to the full path
+- `fs.rename()` renames a file or folder
+- `fs.rmdir()` removes a folder
+- `fs.stat()` returns the status of the file identified by the filename passed. Related: `fs.fstat()`, `fs.lstat()`
+- `fs.symlink()` creates a new symbolic link to a file
+- `fs.truncate()` truncates to the specified length the file identified by the filename passed. Related: `fs.ftruncate()`
+- `fs.unlink()` removes a file or a symbolic link
+- `fs.unwatchFile()` stops watching for changes on a file
+- `fs.utimes()` changes the timestamp of the file identified by the filename passed. Related: `fs.futimes()`
+- `fs.watchFile()` start watching for changes on a file. Related: `fs.watch()`
+- `fs.writeFile()` writes data to a file. Related: `fs.write()`
+
+All of the methods in `fs` are asynchronous by default but can be made synchronous by appending `Sync`, for example `fs.renameSync()`.
+
+For example, `fs.rename()` is used with a callback.
+
+```js
+const fs = require("fs");
+
+fs.rename("before.json", "after.json", (err) => {
+  if (err) {
+    return console.error(err);
+  }
+
+  //done
+});
+```
+
+`fs.renameSync()` can be used with a try/catch block to handle errors
+
+```js
+const fs = require("fs");
+
+try {
+  fs.renameSync("before.json", "after.json");
+  //done
+} catch (err) {
+  console.error(err);
+}
+```
+
+The key difference is that the synchronous version will block the execution of your script until the file operation finishes.
