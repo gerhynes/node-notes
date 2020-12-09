@@ -1242,3 +1242,75 @@ try {
 ```
 
 The key difference is that the synchronous version will block the execution of your script until the file operation finishes.
+
+## The Node path module
+
+The `path` module provides useful functionality for accessing the interacting with the file system.
+
+Its methods include:
+
+`path.basename()`, which returns the last portion of a path. A second param can filter out the file extension.
+
+```js
+require("path").basename("/test/something.txt", ".txt"); //something
+```
+
+`path.dirname()` returns the directory part of a path.
+
+```js
+require("path").dirname("/test/something/file.txt"); // /test/something
+```
+
+`path.extname()` returns the extension part of a path.
+
+```js
+require("path").extname("/test/something/file.txt"); // '.txt'
+```
+
+`path.isAbsolute()` returns true if it's an absolute path.
+
+```js
+require("path").isAbsolute("./test/something"); // false
+```
+
+`path.join()` joins two or more parts of a path.
+
+```js
+const name = "joe";
+require("path").join("/", "users", name, "notes.txt"); //'/users/joe/notes.txt'
+```
+
+`path.normalize()` tries to calculate the actual path when it contains relative specifiers like `..` or double slashes.
+
+`path.parse()` parses a path to an object with the segments that compose it:
+
+- `root` the root
+- `dir` the folder path starting from the root
+- `base` the filename + extension
+- `name` the filename
+- `ext` the file extension
+
+```js
+require('path').parse('/users/test.txt')
+
+// results in
+{
+  root: '/',
+  dir: '/users',
+  base: 'test.txt',
+  ext: '.txt',
+  name: 'test'
+}
+```
+
+`path.relative()` accepts two paths as arguments. It returns the relative path from the first path to the second, based on the current working directory.
+
+```js
+require("path").relative("/Users/joe", "/Users/joe/test.txt"); //'test.txt'
+```
+
+`path.resolve()` gives the absolute path calculation of a relative path.
+
+```js
+path.resolve('joe.txt') //'/Users/joe/joe.txt' if run from the home folder
+```
