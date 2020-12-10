@@ -1312,5 +1312,55 @@ require("path").relative("/Users/joe", "/Users/joe/test.txt"); //'test.txt'
 `path.resolve()` gives the absolute path calculation of a relative path.
 
 ```js
-path.resolve('joe.txt') //'/Users/joe/joe.txt' if run from the home folder
+path.resolve("joe.txt"); //'/Users/joe/joe.txt' if run from the home folder
 ```
+
+## The Node os module
+
+The `os` module provides functions for retrieving information from the underlying operating system and the computer the programme is running on and interacting with.
+
+`os.arch()` returns the string that identifies the underlying architecture, like `arm`, `x64`, `arm64`.
+
+`os.cpus()` returns information on the CPUs available to your system. For example:
+
+```js
+{
+    model: 'Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz',
+    speed: 2400,
+    times: {
+      user: 47267010,
+      nice: 0,
+      sys: 57786530,
+      idle: 83845810,
+      irq: 4336810
+    }
+  }
+```
+
+`os.endianness()` returns `BE` or `LE` depending on if Node was compiled with [Big Endian or Little Endian](https://en.wikipedia.org/wiki/Endianness).
+
+`os.freemem()` return the number of bytes that represent the free memory in the system.
+
+`os.hostname()` return the host name.
+
+`os.loadavg()` returns the calculation made by the operating system on the load average. It only returns a meaningful value on Linux and macOS.
+
+`os.networkInterfaces()` returns the details of the network interfaces available on your system.
+
+`os.platform()` return the platform that Node was compiled for.
+
+`os.release()` returns a string that identifies the operating system release number.
+
+`os.tmpdir()` returns the path to the assigned temp folder.
+
+`os.totalmem()` returns the number of bytes that represent the total memory available in the system.
+
+`os.type()` identifies the operating system:
+
+- Linux
+- `Darwin` on macOS
+- `Windows_NT` on Windows
+
+`os.uptime()` returns the number of seconds the computer has been running since it was last rebooted.
+
+`os.userInfo()` returns an object containing the current `username`, `uid`, `gid`, `shell`, and `homedir`.
