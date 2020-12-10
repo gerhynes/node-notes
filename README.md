@@ -1364,3 +1364,82 @@ The `os` module provides functions for retrieving information from the underlyin
 `os.uptime()` returns the number of seconds the computer has been running since it was last rebooted.
 
 `os.userInfo()` returns an object containing the current `username`, `uid`, `gid`, `shell`, and `homedir`.
+
+## The Node events module
+
+The `events` module provides the EventEmitter class which is essential for working with events in Node.
+
+```js
+const EventEmitter = require("events");
+const door = new EventEmitter();
+```
+
+The event listener uses these events:
+
+- `newListener` when a listener is added
+- `removeListener` when a listener is removed
+
+`emitter.emit` emits an event. It synchronously calls every event listener in the order they were registered.
+
+```js
+door.emit("slam"); // emitting the event "slam"
+```
+
+`emitter.eventNames()` returns an array of strings that represent the events registered on the current `EventEmitter` object.
+
+`emitter.getMaxListeners()` gets the maximum amount of listeners you can add to an `EventEmitter` object, which defaults to 10 but can be increased or lowered by using `setMaxListeners()`
+
+`emitter.listenerCount()` gets the count of listeners of the event passed as parameter:
+
+```js
+door.listenerCount("open");
+```
+
+`emitter.listeners()` gets an array of listeners of the event passed as a parameter
+
+```js
+door.listeners("open");
+```
+
+`emitter.on()` adds a callback function that's called when an event is emitted. Also aliased as `emitter.addListener()`.
+
+```js
+door.on("open", () => {
+  console.log("Door was opened");
+});
+```
+
+`emitter.once()` adds a callback function that's called when an event is emitted for the first time after registering this. This callback will only ever be called once.
+
+```js
+const EventEmitter = require("events");
+const ee = new EventEmitter();
+
+ee.once("my-event", () => {
+  //call callback function once
+});
+```
+
+`emitter.prependListener()` adds a listener and calls it before other listeners in the queue. Compare `e,itter.on()` or `emitter.addListener()`
+
+`emitter.prependOnceListener()` adds a listener and calls it once before other listeners in the queue. Compare `emitter.once()`.
+
+`emitter.removeAllListeners()` removes all listeners of an `EventEmitter` object listening to a specific event:
+
+```js
+door.removeAllListeners("open");
+```
+
+`emitter.removeListener()` removes a specific listener. Also aliased as `emitter.off()`. You can do this by saving the callback function to a variable, when added, so you can reference it later:
+
+```js
+const doSomething = () => {};
+door.on("open", doSomething);
+door.removeListener("open", doSomething);
+```
+
+`emitter.setMaxListeners()` sets that maximum amount of listeners you can add to an `EventEmitter` object, which defaults to 10 but can be increased or lowered.
+
+```js
+door.setMaxListeners(50);
+```
