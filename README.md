@@ -1443,3 +1443,96 @@ door.removeListener("open", doSomething);
 ```js
 door.setMaxListeners(50);
 ```
+
+## The Node http module
+
+The `http` module is key to Node networking.
+
+### Properties
+
+The `http.METHODS` property lists all the HTTP methods supported.
+
+The `http.STATUS_CODES` property lists all the HTTP status codes and their descriptions.
+
+`http.globalAgent` points to the global instance of the Agent object, which is an instance of the `http.Agent` class. It's used to manage connections' persistence and reuse for HTTP clients.
+
+### Methods
+
+`http.createServer()` returns a new instance of the `http.Server` class.
+
+```js
+const server = http.createServer((req, res) => {
+  //handle every single request with this callback
+});
+```
+
+`http.request()` makes a HTTP request to a server, creating an intance of the `http.ClientRequest` class.
+
+`http.get()` works like `http.request()` but automatically sets the HTTP method to GET and calls `req.end()` automatically.
+
+### Classes
+
+`http.Agent` class creates a global instance of the `http.Agent` class to manage connections' persistence and reuse for HTTP clients. This makes sure that every request to a server is queued and a single socket is reused. It also maintains a pool of sockets for performace.
+
+A `http.ClientRequest` object is created when `http.request()` or `http.get()` is called. When a response is received, the `response` event is called with the response, with a `http.IncomingMessage` instance as argument.
+
+The returned data of a resposne can be read in two ways:
+
+- you can call the `response.read()` method
+- in the `response` event handler, you can set up an event listener for the `data` event, so you can listen for the data streamed in.
+
+The `http.Server` class is commonly instantiated and returned when createing a new server using `http.createServer()`.
+
+Once you have a serv object, you have access to its methods:
+
+- `close()` stops the server from accepting new connections
+- `listen()` starts the HTTP server and listens for connections
+
+The `http.ServerResponse` class is created by a `http.Server` and passed as the second parameter in the `request` event it fires.
+
+It is commonly called `res` in code:
+
+```js
+const server = http.createServer((req, res) => {
+  //res is an http.ServerResponse object
+});
+```
+
+In the handler you will call `end()`, which closes the response; the message is complete and the server can send it to the client. It must be called on each response.
+
+These methods are used to interact with HTTP headers:
+
+- `getHeaderNames()` gets the list of the names of the HTTP headers already set
+- `getHeaders()` gets a copy of the HTTP headers already set
+- `setHeader('headername', value)` sets an HTTP header value
+- `getHeader('headername')` gets an HTTP header already set
+- `removeHeader('headername')` removes an HTTP header already set
+- `hasHeader('headername')` returns true if the response has that header set
+- `headersSent()` returns true if the headers have already been sent to the client
+
+After processing the headers, you can send them to the client by calling `response.writeHead()`, whcih accepts the statusCode as the first param, the optional status message, and the headers object.
+
+To send data to the client in the response body, you use `write()`. It will send buffered data to the HTTP response stream.
+
+If the headers were not sent yet using `response.writeHead()`, it will send the headers first, with the status code and message that's set in the request, which you can edit by setting the `statusCode` and `statusMessage` properties values:
+
+```js
+response.statusCode = 500;
+response.statusMessage = "Internal Server Error";
+```
+
+A `http.Incoming Message` object is created by:
+
+- `http.Server` when listening to the `request` event
+- `http.ClientRequest` when listening to the `response` event
+
+It can be used to access the response's
+
+- status, using its `statusCode` and `statusMessage` methods
+- headers, using its `headers` method or `rawHeaders`
+- HTTP method, using its `method` method
+- HTTP version, using the `httpVersion` method
+- URL, using the `url` method
+- underlying socket, using the `socket` method
+
+The data is accessed using streams, since `http.IncomingMessage` implements the Readable Stream interface.
