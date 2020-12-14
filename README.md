@@ -1536,3 +1536,124 @@ It can be used to access the response's
 - underlying socket, using the `socket` method
 
 The data is accessed using streams, since `http.IncomingMessage` implements the Readable Stream interface.
+
+## Node buffers
+
+A buffer is an area of memory. It represents a fixed-size chunk of memory allocated outside of the V\* JavaScript engine and is implemented by the Node Buffer class.
+
+You can think of a buffer like an array of integers, which each represent a byte of data.
+
+### Why buffers?
+
+Buffers were introduced to help developers deal with binary data in an ecosystem that traditionally dealt only with strings rather than binaries.
+
+Buffers are deeply linked with streams. When a stream processor receives data faster than it can digest it, it puts the data in a buffer.
+
+For example, when you are watching a YouTube video and the red line goes beyond your visualization point, you are downloading the data faster than you're viewing it, and your browser buffers it.
+
+### Creating a buffer
+
+A buffer is created using the `Buffer.from()`, `Buffer.alloc()` and `Buffer.allocUnsafe()` methods.
+
+You can initialize the buffer passing the size. This creates a 1kb buffer:
+
+```js
+const buf = Buffer.alloc(1024);
+//or
+const buf = Buffer.allocUnsafe(1024);
+```
+
+Both `alloc` and `allocUnsafe` allocate a `Buffer` with a specified size in bytes. `alloc` initializes the `Buffer` with zeroes. But `allocUnsafe` creates a buffer that is uninitialized, meaning the allocated segment of memory may contain old (and potentially sensitive) data.
+
+Older data, if present in memory could be accessed or leaked when the `Buffer` memory is read. `allocUnsafe` is faster than `alloc` but must be used with care.
+
+### Using a buffer
+
+#### Accessing the content of a buffer
+
+Since a buffer is an array of bytes, you can access it like an array.
+
+```js
+const buf = Buffer.from("Hey!");
+console.log(buf[0]); //72
+console.log(buf[1]); //101
+```
+
+These numbers are the Unicode Code that identifies the character in the buffer position (H => 72, e => 101).
+
+You can print the full content of the buffer using the `toString()` method.
+
+```js
+console.log(buf.toString());
+```
+
+#### Getting the length of a buffer
+
+You can get the length of a buffer using the `length` property.
+
+```js
+const buf = Buffer.from("Hey!");
+console.log(buf.length);
+```
+
+#### Iterating over the contents of a buffer
+
+```js
+const buf = Buffer.from("Hey!");
+for (const item of buf) {
+  console.log(item); //72 101 121 33
+}
+```
+
+#### Changing the contents of a buffer
+
+You cna write a string of data to a buffer using the `write()` method.
+
+```js
+const buf = Buffer.alloc(4);
+buf.write("Hey!");
+```
+
+You can set the contents of a buffer using array syntax.
+
+```js
+const buf = Buffer.from("Hey!");
+buf[1] = 111; //o
+console.log(buf.toString()); //Hoy!
+```
+
+#### Copying a buffer
+
+You can copy a buffer using the `copy()` method.
+
+```js
+const buf = Buffer.from("Hey!");
+let bufcopy = Buffer.alloc(4); //allocate 4 bytes
+buf.copy(bufcopy);
+```
+
+By default, you copy the whole buffer. Three params let you define: 1. the starting position, 2. the ending position, and 3. the new buffer length.
+
+```js
+const buf = Buffer.from("Hey!");
+let bufcopy = Buffer.alloc(2); //allocate 2 bytes
+buf.copy(bufcopy, 0, 0, 2);
+bufcopy.toString(); //'He'
+```
+
+#### Slicing a buffer
+
+If you want to create a partial visualization of a buffer, you can create a slice. A slice is not a copy, the original buffer is still the source of truth. If the original changes, the slice changes.
+
+You use the `slice()` method to create a slice. The first param is the starting position, and you can specify an optional second param with the end position:
+
+```js
+const buf = Buffer.from('Hey!')
+buf.slice(0).toString() //Hey!
+const slice = buf.slice(0, 2)
+console.log(slice.toString()) //He
+buf[1] = 111 //o
+console.log(slice.toString()) //Ho
+```
+
+## Node Streams
