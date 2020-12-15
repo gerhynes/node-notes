@@ -1648,12 +1648,99 @@ If you want to create a partial visualization of a buffer, you can create a slic
 You use the `slice()` method to create a slice. The first param is the starting position, and you can specify an optional second param with the end position:
 
 ```js
-const buf = Buffer.from('Hey!')
-buf.slice(0).toString() //Hey!
-const slice = buf.slice(0, 2)
-console.log(slice.toString()) //He
-buf[1] = 111 //o
-console.log(slice.toString()) //Ho
+const buf = Buffer.from("Hey!");
+buf.slice(0).toString(); //Hey!
+const slice = buf.slice(0, 2);
+console.log(slice.toString()); //He
+buf[1] = 111; //o
+console.log(slice.toString()); //Ho
 ```
 
 ## Node Streams
+
+Streams are a fundamental part of Node applications. Tey are a way to handle reading/writing files, network communications, and any kind of end-to-end exchange in an efficient way.
+
+Streams were introduced in the Unix operating system decades ago and programs can interact with each other passing streams through the pipe operator, `|`.
+
+Traditionally, when you tell a program to read a file, the file is read into memory, from start to finish, and then you process it.
+
+With streams, you read it piece by piece, processing its content without keeping it all in memory.
+
+The Node `stream` module provides the foundationfor streaming APIs, while all streams are instances of `EventEmitter`.
+
+#### Why streams?
+
+Streams provide two major advantages over usign other data handling methods:
+
+- Memory efficiency: you don't need to load large amounts of data in memory before you are able to process it.
+- Time efficiency: it takes less time to start processing data as soon as you have it, rather than waiting until the whole data payload is available.
+
+#### An example of a stream
+
+A typical example is reading files from a disk.
+
+Using the Node `fs` module, you can read a file and serve it over a HTTP server when a new connection is established to your HTTP server:
+
+```js
+const http = require("http");
+const fs = require("fs");
+
+const server = http.createServer(function (req, res) {
+  fs.readFile(__dirname + "/data.txt", (err, data) => {
+    res.end(data);
+  });
+});
+server.listen(3000);
+```
+
+`readFile()` reads the full contents of the file and invokes the callback function when it's done.
+
+`res.end(data)` in the callback will return the file contents to the HTTP client.
+
+If the file is large, the operation will take quite a bit of time. Here is the same thing written using streams:
+
+```js
+const http = require("http");
+const fs = require("fs");
+
+const server = http.createServer((req, res) => {
+  const stream = fs.createReadStream(__dirname + "/data.txt");
+  stream.pipe(res);
+});
+server.listen(3000);
+```
+
+Instead of waiting until the file is fully read, you start streaming it to the HTTP client as soon as you have a shunk of data ready to be sent.
+
+#### pipe()
+
+In the above example the `pipe()` method is called on the file stream. The return value of te `pipe()` method is the destination stream. This is convenient as it lets you chain multiple `pipe()` calls:
+
+```js
+src.pipe(dest1).pipe(dest2);
+```
+
+#### Node APIs powered by streams
+
+Due to their advantages, many core Node modules provide native stream handling capabilities:
+
+- `process.stdin` returns a stream connected to stdin
+- `process.stdout` returns a stream connected to stdout
+- `process.stderr` returns a stream connected to stderr
+- `fs.createReadStream()` creates a readable stream to a file
+- `fs.createWriteStream()` creates a writable stream to a file
+- `net.connect()` initiates a stream-based connection
+- `http.request()` returns an instance of the http.ClientRequest class, which is a writable stream
+- `zlib.createGzip()` compresses data using gzip (a compression algorithm) into a stream
+- `zlib.createGunzip()` decompresses a gzip stream.
+- `zlib.createDeflate()` compresses data using deflate (a compression algorithm) into a stream
+- `zlib.createInflate()` decompresses a deflate stream
+
+#### Different types of streams
+
+There are four classes of streams:
+
+- Readable: a stream you can pipe from, but not pipe into(you can receive data, but not send data to it). When you push data into a readable stream, it is buffered until a consumer starts to read the data.
+- Writable: a stream you can pipe into, but not pipe from (you can send data, but not receive it).
+- Duplex: a stream you can both pipe into and pipe from, essentially a combination of a Readable and Writable stream
+- Transform: similar to a Duplex, but the output is a transformation of its input
