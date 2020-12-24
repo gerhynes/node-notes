@@ -37,7 +37,7 @@ Currently Node uses the CommonJS module system while browsers are starting to us
 
 V8 is the JavaScript engine that powers Chrome. V8 provides the runtime environment that the JavaScript executes in. The DOM and the other web APIs are provided by the browser.
 
-Node benefits for the race for performance between browser providers. As V8 improves, Node becomes faster.
+Node benefits from the race for performance between browser providers. As V8 improves, Node becomes faster.
 
 Although JavaScript is usually considered an interpreted language, modern JavaScript engine compile it.
 
@@ -1744,3 +1744,97 @@ There are four classes of streams:
 - Writable: a stream you can pipe into, but not pipe from (you can send data, but not receive it).
 - Duplex: a stream you can both pipe into and pipe from, essentially a combination of a Readable and Writable stream
 - Transform: similar to a Duplex, but the output is a transformation of its input
+
+#### Creating a readable stream
+
+You get a readable stream from the `stream` module, initialize it, and implement the `readable._read()` method.
+
+```js
+// Create the stream object
+const Stream = require("stream");
+const readableStream = new Stream.Readable();
+// Implement _read
+readableStream._read = () => {};
+// Now you can send data
+readableStream.push("hi!");
+```
+
+#### Creating a writable stream
+
+To create a writable stream, you extend the base `Writeable` object and implement its `_write()` method.
+
+```js
+// Create the stream object
+const Stream = require("stream");
+const writableStream = new Stream.Writable();
+// Implement _write
+writableStream._write = (chunk, encoding, next) => {
+  console.log(chunk.toString());
+  next();
+};
+// Now pipe in a readable stream
+process.stdin.pipe(writableStream);
+```
+
+#### Getting data from a readable stream
+
+You use a writable stream to get data from a readable stream:
+
+```js
+const Stream = require("stream");
+
+const readableStream = new Stream.Readable({
+  read() {}
+});
+const writableStream = new Stream.Writable();
+
+writableStream._write = (chunk, encoding, next) => {
+  console.log(chunk.toString());
+  next();
+};
+
+readableStream.pipe(writableStream);
+
+readableStream.push("hi!");
+```
+
+You can also consume a readable stream directly, using the `readable` event:
+
+```js
+readableStream.on("readable", () => {
+  console.log(readableStream.read());
+});
+```
+
+#### Sending data to a writable stream
+
+Use the `write()` method:
+
+```js
+writableStream.write("hey!\n");
+```
+
+#### Signalling to a writable stream that you have ended writing
+
+Use the `end()` method:
+
+```js
+const Stream = require("stream");
+
+const readableStream = new Stream.Readable({
+  read() {}
+});
+const writableStream = new Stream.Writable();
+
+writableStream._write = (chunk, encoding, next) => {
+  console.log(chunk.toString());
+  next();
+};
+
+readableStream.pipe(writableStream);
+
+readableStream.push("hi!");
+readableStream.push("ho!");
+
+writableStream.end();
+```
