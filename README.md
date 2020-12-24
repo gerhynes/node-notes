@@ -1838,3 +1838,56 @@ readableStream.push("ho!");
 
 writableStream.end();
 ```
+
+### Development and Production Environments
+
+Node allows for different configurations between development and production environments.
+
+Node assumes it's running in development. Setting the `NODE_ENV=production` environment variable signals that you're running the code in production.
+
+You can do this by executing:
+
+```js
+export NODE_ENV=production
+```
+
+But it's better to put it in your shell configuration file so that it persists in case of a system restart.
+
+You can prepend the environment variable to your application's initialization command:
+
+```js
+NODE_ENV=production node app.js
+```
+
+Setting the environment to production generally ensures that:
+
+- logging is kept to a minimum, essential level
+- more caching levels take place to optimize performance
+
+For example, Pug views are compiled in every request in development mode but in production they are cached.
+
+You can use conditionals to execute code in different environments:
+
+```js
+if (process.env.NODE_ENV === "development") {
+  //...
+}
+if (process.env.NODE_ENV === "production") {
+  //...
+}
+if(['production', 'staging'].indexOf(process.env.NODE_ENV) >= 0) {
+  //...
+})
+```
+
+For example, you might want to handle errors differently in development and production:
+
+```js
+if (process.env.NODE_ENV === "development") {
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }))
+})
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.errorHandler())
+})
+```
