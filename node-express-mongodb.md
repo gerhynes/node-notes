@@ -39,3 +39,25 @@ You can require an entire directory. Node will look for the `index.js` file in t
 ### NPM
 
 NPM is both (1) a library of thousands of packages published by other developers and (2) a command line tool to easily install and manage those packages in a Node project.
+
+## MongoDB
+
+If your application needs to persist data, you need a database.
+
+Databases can handle large amounts of data efficiently and store it compactly. They provide tools to more easily insert, query and update data. Usually, they also offer security features and access control. They also need to be able to scale.
+
+There are two broad categories of databses: SQL and NoSQL.
+
+SQL databases are relational and share a Structured Query Language. You define the database's structure ahead of time.
+
+NoSQL databases cover multiple common types: document, key-value, graph.
+
+A document data store can be more flexible since you aren't bound to a pre-defined schema.
+
+MongoDB is a popular document-based database commonly used with Node. It pairs well with JavaScript and has a strong community.
+
+MongoDB uses BSON (Binary-JSON) which is faster and more space-efficient than JSON. It also supports more data types.
+
+To insert documents into MongoDB, you insert them into a collection. If you insert into a collection that doesn't exist, it will be created.
+
+A unique primary key `_id` is added to every item in a collection.
