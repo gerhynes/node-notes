@@ -40,6 +40,37 @@ You can require an entire directory. Node will look for the `index.js` file in t
 
 NPM is both (1) a library of thousands of packages published by other developers and (2) a command line tool to easily install and manage those packages in a Node project.
 
+## Express
+
+### Middleware
+
+Express middleware are functions that run during the request/response lifecycle.
+
+Each middleware can execute code as well as acess and change the request and response objects.
+
+Middleware can end the HTTP request by sending back a response with methods like `res.send()`.
+
+Middleware can also be chained together, one affecting another by calling `next()`.
+
+With Express, `app.use()` lets you run code on every request.
+
+```js
+const requestTime = (req, res, next) => {
+  req.requestTime = Date.now();
+  next();
+};
+
+app.use(requestTime);
+```
+
+You can pass multiple callbacks to your routes. As long as they call `next()`, Express will move on to the next callback.
+
+```js
+app.get("/secret", verifyPassword, (req, res) => {
+  // Do something
+});
+```
+
 ## MongoDB
 
 If your application needs to persist data, you need a database.
