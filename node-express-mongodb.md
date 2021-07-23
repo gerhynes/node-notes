@@ -38,9 +38,33 @@ You can require an entire directory. Node will look for the `index.js` file in t
 
 ### NPM
 
-NPM is both (1) a library of thousands of packages published by other developers and (2) a command line tool to easily install and manage those packages in a Node project.
+NPM is both
+
+1. a library of thousands of packages published by other developers and
+2. a command line tool to easily install and manage those packages in a Node project.
 
 ## Express
+
+Express is a web framework for Node. It helps you to
+
+- start up a server to listen for requests
+- parse incoming requests
+- match those requests to particular routes
+- create http responses and associated content
+
+A HTTP request is not a JavaScript object, it's text. Express turns in into an object.
+
+On every incoming request you have access to an object representing the incoming request and an object representing the outgoing response.
+
+The objects have methods that you can make use of, for example `res.send` which will generate and send a HTTP response.
+
+Express takes incoming requests and a path and matches them to a response.
+
+```js
+app.get("/posts", (req, res) => {
+  res.send("Posts!");
+});
+```
 
 ### Middleware
 
