@@ -113,6 +113,66 @@ MongoDB is a popular document-based database commonly used with Node. It pairs w
 
 MongoDB uses BSON (Binary-JSON) which is faster and more space-efficient than JSON. It also supports more data types.
 
+Once you have MongoDB installed locally, to start using it, you connect a `mongo.exe` shell to the running MongoDB instance.
+
+On Windows, enter `"C:\Program Files\MongoDB\Server\5.0\bin\mongo.exe"` into a Command Prompt with Administrative priviledges.
+
 To insert documents into MongoDB, you insert them into a collection. If you insert into a collection that doesn't exist, it will be created.
 
 A unique primary key `_id` is added to every item in a collection.
+
+### Mongoose
+
+Mongoose is an ODM (Object Data Mapper / Object Document Mapper). It maps documents coming from a database into usable JavaScript objects.
+
+Mongoose proivdes ways for you to model your application data and define schemas. It can also validate data and build complex queries from within JavaScript.
+
+```js
+const mongoose = require("mongoose");
+
+mongoose
+  .connect("mongodb://localhost:27017/test", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log("DB Connection Open");
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+### Models
+
+Models are JavaScript classes that you make with the assistance of Mongoose that represent information in a collection in a MongoDB database.
+
+You need to define a model for every resource you plan on working with.
+
+For each model you need to define a schema. A schema is a mapping of different collection keys in MongoDB to different types in JavaScript.
+
+```js
+const movieSchema = new Mongoose.Schema({
+  title: String,
+  year: Number,
+  score: Number,
+  rating: String
+});
+
+const Movie = mongoose.model("Movie", movieSchema);
+```
+
+Mongoose will take the name of the model "Movie" and create a collection "movies".
+
+You save the model to a JavaScript class and can then make new instances of your class and save them to your database.
+
+```js
+const amadeus = new Movie({
+  title: "Amadeus",
+  year: 1984,
+  score: 9.2,
+  rating: "R"
+});
+
+amadeus.save();
+```
