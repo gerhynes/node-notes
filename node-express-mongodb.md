@@ -95,6 +95,90 @@ app.get("/secret", verifyPassword, (req, res) => {
 });
 ```
 
+### Error Handling
+
+Working with Express, a lot of errors will be due to incomplete data, problems interacting with your database, and proplems connecting to APIs.
+
+Express comes with a built-in error handler which will respond when an error is thrown. It includes a status code and stack trace.
+
+You can define error-handling middleware functions which take an error as their first parameter.
+
+```js
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send("Something went wrong");
+});
+```
+
+Express is set up so that if you execute `next()` and pass something in, it knows it's an error.
+
+Often you'll want to define your own error class with methods allowing you to respond to different errors with a status code and message. The default error-handler will use this status.
+
+```js
+class AppError extends Errror {
+  constructor(status, message) {
+    super();
+    this.status = status;
+    this.message = message;
+  }
+}
+
+app.get("/admin", (req, res) => {
+  throw new AppError(403, "You are not an admin!");
+});
+```
+
+#### Handling async errors
+
+For errors returned from asynchronous functions invoked by route handlers and middleware, you must pass them to `next()`, where Express will catch and process them.
+
+```js
+app.get("/products/:id", async (req, res, next) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) {
+    return next(new AppError("Product not found", 404));
+  }
+  res.render("products/show", { product });
+});
+```
+
+It's good practice to add a try-catch block to all async functions to catch errors thrown by Mongoose or external APIs.
+
+```js
+app.post("/products", async (req, res, next) => {
+  try {
+    const newProduct = new Product(req.body);
+    await newProduct.save();
+    res.redirect(`/products/${newProduct._id}`);
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+Even better is to create a utility function for handling asynchronous errors.
+
+```js
+function wrapAsync(fn) {
+  return function (req, res, next) {
+    fn(req, res, next).catch((err) => next(err));
+  };
+}
+
+app.get(
+  "/products/:id",
+  wrapAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    if (!product) {
+      throw new AppError("Product not found", 404);
+    }
+    res.render("products/show", { product });
+  })
+);
+```
+
 ## MongoDB
 
 If your application needs to persist data, you need a database.
@@ -117,9 +201,13 @@ Once you have MongoDB installed locally, to start using it, you connect a `mongo
 
 On Windows, enter `"C:\Program Files\MongoDB\Server\5.0\bin\mongo.exe"` into a Command Prompt with Administrative priviledges.
 
+### CRUD Operations
+
 To insert documents into MongoDB, you insert them into a collection. If you insert into a collection that doesn't exist, it will be created.
 
-A unique primary key `_id` is added to every item in a collection.
+Using `db.collection.insert()` you can pass in a single document (a JavaScript object) or an array of documents. You can also use `db.collection.insertOne()` or `db.collection.insertMany()`.
+
+A unique primary key `_id` is added to every item in a collection. You can also specify an `_id`.
 
 ### Mongoose
 
@@ -176,3 +264,24 @@ const amadeus = new Movie({
 
 amadeus.save();
 ```
+
+You can insert multiple documents into a colection using the `insertMany` method on the model. This takes an arrray of objects and returns a promise.
+
+```js
+Movie.insertMany([
+  { title: "Amelie", year: 2001, score: 8.3, rating: "R" },
+  { title: "Alien", year: 1979, score: 8.1, rating: "R" },
+  { title: "The Iron Giant", year: 1999, score: 7.5, rating: "PG" },
+  { title: "Stand By Me", year: 1986, score: 8.6, rating: "R" },
+  { title: "Moonrise Kingdom", year: 2012, score: 7.3, rating: "PG-13" }
+])
+  .then((data) => {
+    console.log("It worked");
+    console.log(data);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+There are multiple ways to find records with Mongoose.
