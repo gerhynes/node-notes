@@ -231,6 +231,18 @@ mongoose
   });
 ```
 
+You can single out specific Mongoose errors and handle them seperately.
+
+```js
+app.use((err, req, res, next) => {
+  console.log(err.name);
+  if (err.name === "ValidationError") {
+    err = handleValidationError(err);
+  }
+  next(err);
+});
+```
+
 ### Models
 
 Models are JavaScript classes that you make with the assistance of Mongoose that represent information in a collection in a MongoDB database.
@@ -285,3 +297,114 @@ Movie.insertMany([
 ```
 
 There are multiple ways to find records with Mongoose.
+
+### Mongo Relationships
+
+In relational databases you have independent tables and reference relationships between them to avoid storing duplicate data.
+
+You can have one to many relationships, for example, a user to their comments, where one user has many comments but each comment is connected to just one user.
+
+You can also have many to many relationships, for example, movies to actors, where you would need a third table for roles which would connect movies to actors.
+
+MongoDB gives you a lot of options for how to structure your data but this comes wth its own challenges.
+
+#### One to Few
+
+In the case of one to few relationships, the easiest approach is to embed the data directly in the document.
+
+For example, a person usually has a limited number of addresses and your primary way of interacting with an address is through a user. So it makes sense to store them in the user document.
+
+```js
+{
+  name: "Tommy Cash",
+  savedAddresses: [
+    { street: "Rahukohyu 3", city: "Talinn", country: "Estonia" },
+    { street: "Ravala 5", city: "Talinn", country: "Estonia" },
+  ]
+}
+```
+
+Mongoose treats nested documents as their own embedded schemas and gives them a unique id by default. You can turn this off.
+
+#### One to Many
+
+When you have a relationship between many documents, one option is to store your data seperately but then store references to document ids somewhere inside the parent document. This is similar to how relational databases work.
+
+```js
+{
+  name: "Full Belly Farms",
+  location: "Gurinda, CA",
+  products: [
+    OBjectId("2819781267781"),
+    OBjectId("1287526267789"),
+    OBjectId("5563398021890"),
+  ]
+}
+```
+
+```js
+const farmSchema = new Schema({
+  name: String,
+  location: String,
+  products: [{ type: Schema.Types.ObjectId, ref: "Product" }]
+});
+
+const farm = new Farm({ name: "Full Belly Farms", location: "Gurinda, CA" });
+farm.products.push(melon);
+farm.save();
+```
+
+#### Mongoose Populate
+
+By default, Mongoose just saves the ids of embedded documents. The `ref` option tells Mongoose which model the id is connected to.
+
+To query for a document and its embedded documents, use the `populate()` method.
+
+```js
+Farm.findOne({ name: "Full Belly Farms" })
+  .populate("products")
+  .then((farm) => console.log(farm));
+```
+
+#### One to Bajillions
+
+With a large volume of data, thousands or more documents, it's more efficient to store a reference to the parent on the child document.
+
+```js
+{
+  tweetText: "I just crashed my car because I was tweeting",
+  tags: ["yolo", "eejit", "carcrash"],
+  user: ObjectId("2133243243")
+}
+```
+
+```js
+const userSchema = new Schema({
+  username: String,
+  handle: String
+});
+
+const tweetSchema = new Schema({
+  text: String,
+  likes: Number,
+  user: { type: Schema.Types.ObjectId, ref: "User" }
+});
+
+const User = mongoose.model("User", userSchema);
+const Tweet = mongoose.model("Tweet", tweetSchema);
+
+const user1 = new User({ name: "chickenfan99", handle: "@chickenfan99" });
+const tweet1 = new Tweet({ text: "I love my chicken family", likes: 0 });
+tweet1.user = user1;
+user1.save();
+tweet1.save();
+
+const t1 = await Tweet.findOne({}).populate("user");
+
+// You can also choose to only populate certain fields
+const t2 = await Tweet.findOne({}).populate("user", "username");
+```
+
+To complicate things further, you could store a reference on the parent and on the child document so you could go both directions if necessary.
+
+You could also choose to duplicate some information if it is often queried together, for example storing the username, rather than just the userId, on a tweet.
