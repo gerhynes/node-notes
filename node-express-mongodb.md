@@ -408,3 +408,20 @@ const t2 = await Tweet.findOne({}).populate("user", "username");
 To complicate things further, you could store a reference on the parent and on the child document so you could go both directions if necessary.
 
 You could also choose to duplicate some information if it is often queried together, for example storing the username, rather than just the userId, on a tweet.
+
+#### Mongo Schema Design
+
+To recap:
+
+- you can embed data in a one to many relationship
+- you can have two seperate entities and store a reference on the one side
+- you can have two seperate entities and store a reference on the many side
+- you can denormalize as many fields as you like, duplicating data on both sides, if it makes sense in your application
+
+MongoDB's [advice](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-3) is to
+
+- favor embedding unless there is a compelling reason not to.
+- needing to access an object on its own is a compelling reason not to embed it.
+- Arrays should not grow without bound. If there are more than a couple of hundred documents on the “many” side, don’t embed them; if there are more than a few thousand documents on the “many” side, don’t use an array of ObjectID references.
+- Consider the write/read ratio when denormalizing. A field that will mostly be read and only seldom updated is a good candidate for denormalization: if you denormalize a field that is updated frequently then the extra work of finding and updating all the instances is likely to overwhelm the savings that you get from denormalizing.
+- As always with MongoDB, how you model your data depends – entirely – on your particular application’s data access patterns. You want to structure your data to match the ways that your application queries and updates it.
