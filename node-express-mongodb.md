@@ -425,3 +425,23 @@ MongoDB's [advice](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongod
 - Arrays should not grow without bound. If there are more than a couple of hundred documents on the “many” side, don’t embed them; if there are more than a few thousand documents on the “many” side, don’t use an array of ObjectID references.
 - Consider the write/read ratio when denormalizing. A field that will mostly be read and only seldom updated is a good candidate for denormalization: if you denormalize a field that is updated frequently then the extra work of finding and updating all the instances is likely to overwhelm the savings that you get from denormalizing.
 - As always with MongoDB, how you model your data depends – entirely – on your particular application’s data access patterns. You want to structure your data to match the ways that your application queries and updates it.
+
+#### Deleting related documents
+
+If you want to delete all associated documents when you delete a document, you can do it manually by finding and deleting them or you can use a Mongoose middleware.
+
+Mongoose's middleware, also called pre and post hooks, let you run functions before or after an action happens. They are totally seperate from Express middlware and do not need you to call `next()`.
+
+For example, `findByIdAndDelete()` triggers the middleware `findOneAndDelete()`.
+
+With a query middleware, you need to wait until after the query was completed so that you have access to the document that was found.
+
+```js
+// Delete all associated products after a farm is deleted
+farmSchema.post("findOneAndDelete", async function (farm) {
+  if (farm.products.length) {
+    const res = await Product.deleteMany({ _id: { $in: farm.products } });
+    console.log(res);
+  }
+});
+```
