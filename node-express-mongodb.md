@@ -179,6 +179,79 @@ app.get(
 );
 ```
 
+### Express Router
+
+`express.Router()` creates a new router object that lets you group your routes and reduce duplication.
+
+```js
+// /routes/shelters.js
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send("All animal shelters");
+});
+
+module.exports = router;
+
+// app.js
+const shelterRoutes = require("./routes/shelters");
+
+app.use("/shelters", shelterRoutes);
+```
+
+You can also add in middleware that will only apply to routes in a particular router.
+
+```js
+// /routes/admin.js
+const router = express.Router();
+
+router.use((req, res, next) => {
+  if (req.query.isAdmin) {
+    next();
+  }
+  res.send("Sorry, not an admin");
+});
+
+router.get("/topsecret", (req, res) => {
+  res.send("This is top secret");
+});
+module.exports = router;
+
+// app.js
+const adminRoutes = require("./routes/admin");
+
+app.use("/admin", adminRoutes);
+```
+
+### Cookies
+
+Cookies are bits of information stored in a user's vorwser when browsing a particular website.
+
+Once a cookie is et, a user's browser will send the cookie on every subsequent request to the site.
+
+Cookies allow you to make HTTP **stateful**.
+
+```js
+app.get("/setname", (req, res) => {
+  res.cookie("name", "Ashley");
+  res.send("Sent you a cookie");
+});
+```
+
+Express doesn't have cookie parsing by default. Use the `cookie-parser` package. On every incoming request, you will have a property `req.cookies`.
+
+```js
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+app.get("/greet", (req, res) => {
+  const { name = "anonymous" } = req.cookies;
+  res.send(`Hey there, ${name}`);
+});
+```
+
+Signing a cookie lets you verify the integrty of the information it contains; that it hasn't changed.
+
 ## MongoDB
 
 If your application needs to persist data, you need a database.
