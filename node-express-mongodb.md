@@ -233,7 +233,7 @@ Cookies allow you to make HTTP **stateful**.
 
 ```js
 app.get("/setname", (req, res) => {
-  res.cookie("name", "Ashley");
+  res.cookie("name", "henrietta");
   res.send("Sent you a cookie");
 });
 ```
@@ -250,7 +250,78 @@ app.get("/greet", (req, res) => {
 });
 ```
 
-Signing a cookie lets you verify the integrty of the information it contains; that it hasn't changed.
+Signing a cookie lets you verify the integrity of the information it contains; that it hasn't changed. These are available in `req.signedCookies`.
+
+If a signed cookie is altered it's value will show up as `false` in signedCookies since it cannot be verified.
+
+```js
+// Pass secret to cookieParser
+app.use(cookieParser("fdkjhslkjfhlkhgfhjjkhkhjurd"));
+
+app.get("/getsignedcookie", (req, res) => {
+  res.cookie("fruit", "grape", { signed: true });
+  res.send("Signed fruit cookie");
+});
+
+app.get("verifyfruit", (req, res) => {
+  res.send(req.signedCookies);
+});
+```
+
+Under the hood, cookieParser uses HMAC (hash-based message authentication code) signing. It takes a secret and hashes it using sha256, then attaches this to the cookie. If the cookie changes the signed cookie will be different and no longer match.
+
+### Sessions
+
+Sessions are a server-side data store to add statefulness to HTTP, persisting data from one request to the next.
+
+Cookies have a maximum size and are not as secure as storing data on the server.
+
+With sessions, data is stored on the server and a cookie is sent to the browser to act as a key to retrieve the data.
+
+```js
+const session = require("express-session");
+
+const sessionOptions = {
+  secret: "thisisnotagoodsecret",
+  resave: false,
+  saveUninitialized: false
+};
+app.use(session(sessionOptions));
+
+app.get("/viewcount", (req, res) => {
+  if (req.session.count) {
+    req.session.count += 1;
+  } else {
+    req.session.count = 1;
+  }
+  res.send(`You have viewed this page ${req.session.count} times`);
+});
+```
+
+In production you would need to save the session to a session store, such as Redis.
+
+#### Flash messages
+
+A flash is a place in the session for sending a message to the user, for example success or failure, that appears once and then goes away.
+
+```js
+const flash = require("connect-flash");
+app.use(flash);
+
+app.get("/flash", (req, res) => {
+  req.flash("success", "Flash ah ha");
+  res.redirect("/");
+});
+```
+
+You can make flash messages available on the response object using `res.locals`.
+
+```js
+app.use((req, res, next) => {
+  res.locals.messages = req.flash(success);
+  next();
+});
+```
 
 ## MongoDB
 
