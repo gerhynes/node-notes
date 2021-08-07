@@ -589,3 +589,37 @@ farmSchema.post("findOneAndDelete", async function (farm) {
   }
 });
 ```
+
+### Authentication
+
+Authentication is the process of verifying who a particular user is.
+
+Often you authenticate with a username/password combination but there are many possible ways from security questions to facial recognition.
+
+Authorization is verifying what a specific user has access to.
+
+Generally, you authorize a user after authenticating them. Once you know who they are, you know what they are / aren't allowed to do.
+
+Rule 1: Never store passwords in text.
+
+Instead, run the password through a hashing function first and then store the result in the database.
+
+Hashing functions are functions that map input data of some arbitrary size to fixed-size output values.
+
+When a user logs in with a password, the password is run through the same hashing function and the two outputs are compared.
+
+#### Cryptographic Hashing Functions
+
+1. One-way functions which are infeasible to revert
+2. Small change in input yields a large change in output
+3. Deterministic - same input yields same output
+4. Unlikely to find 2 outputs with the same value
+5. Password hash functions are delibrately slow to make brute forcing slower
+
+Salting is an extra step taken to make passwords harder to reverse engineer.
+
+A salt is a random value added to the password before we hash it. It helps ensure unique hashes and mitigates common attacks.
+
+#### Bcrypt
+
+bcrypt is a popular password hashing function with implementations in multiple languages.
