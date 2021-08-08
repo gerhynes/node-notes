@@ -623,3 +623,88 @@ A salt is a random value added to the password before we hash it. It helps ensur
 #### Bcrypt
 
 bcrypt is a popular password hashing function with implementations in multiple languages.
+
+The number of salt rounds can be configured to make the process slower and deter brute-force attacks.
+
+```js
+const hashPassword = async (pw) => {
+  const salt = await bcrypt.genSalt(12); // saltRounds
+  const hash = await bcrypt.hash(pw, salt);
+  console.log(salt);
+  console.log(hash);
+};
+
+const login = async (pw, hashedPw) => {
+  const result = await bcrypt.compare(pw, hashedPw);
+  if (result) {
+    console.log("Success. Logged in");
+  } else {
+    console.log("Incorrect. Try again");
+  }
+};
+```
+
+#### Sessions
+
+When a user logs in, you want to keep them logged in by storing some information about them in the session.
+
+A signed cookie is sent back to the client containing a session id for the signed in user.
+
+You can then compare the id in the cookie to that in the session.
+
+```js
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ username });
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (validPassword) {
+    req.session.user_id = user._id;
+    res.redirect("/secret");
+  } else {
+    res.send("Invalid username or password");
+  }
+});
+```
+
+To log out, you can set the user's id to `null` or call `req.session.destroy()` to remove the entire session.
+
+```js
+app.post("/logout", (req, res) => {
+  req.session.user_id = null;
+  res.redirect("/login");
+});
+```
+
+If you need to protect multiple routes, you can use a middleware to require login.
+
+```js
+const requireLogin = (req, res, next) => {
+  if (!req.session.user_id) {
+    return res.redirect("/login");
+  } else {
+    next();
+  }
+};
+
+app.get("/secret", requireLogin, (req, res) => {
+  res.render("secret");
+});
+```
+
+You can move some of the authentication logic into the user model.
+
+```js
+// Static method to find and validate user
+userSchema.statics.findAndValidate = async function (username, password) {
+  const foundUser = await this.findOne({ username });
+  const isValid = await bcrypt.compare(password, foundUser.password);
+  return isValid ? foundUser : false;
+};
+
+// Middleware to hash any new password
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+```
