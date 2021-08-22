@@ -708,3 +708,30 @@ userSchema.pre("save", async function (next) {
   next();
 });
 ```
+
+## Security
+
+### Mongo Injection
+
+If you are writing a database query that uses user input to form the query (for example, a search field), you are opening your application to SQL injection (or in this case Mongo injection).
+
+```js
+db.users.find({ username: req.body.username });
+
+// Find users where username is greater than "" - all of them
+db.users.find({ username: { $gt: "" } });
+```
+
+You can remove or replace certain characters, such as `$` or `.`, using a package like `express-mongo-sanitize`
+
+### Cross-site Scripting (XSS)
+
+This is when an attacker injects client-side script into somebody else's webpage.
+
+In 2017, Symantex estimated that cross-site scripting accounted for 84% of all security vulnerabilities reported.
+
+If you can get code to run one somebody else's application, you can access information that should be kept secret, for example viewing users' cookies.
+
+One thing the script could do is to create a new image and set the src to the attacker's server with `document.cookie` as a query parameter. When the image loads the browser will send a request to that server, carrying the cookie information to it.
+
+Ejs escapes HTML but does not strip out JavaScript. You can write an extension to Joi to sanitize inputs.
