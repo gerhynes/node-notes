@@ -735,3 +735,39 @@ If you can get code to run one somebody else's application, you can access infor
 One thing the script could do is to create a new image and set the src to the attacker's server with `document.cookie` as a query parameter. When the image loads the browser will send a request to that server, carrying the cookie information to it.
 
 Ejs escapes HTML but does not strip out JavaScript. You can write an extension to Joi to sanitize inputs.
+
+### Helmet
+
+Helmet is a middleware that helps you secure your Express apps by setting various HTTP headers.
+
+The top-level `helmet` function is a wrapper around 15 smaller middlewares, 11 of which are enabled by default.
+
+```js
+// This
+app.use(helmet());
+
+// is equivalent to this:
+app.use(helmet.contentSecurityPolicy());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
+```
+
+You can set custom options for each of the middlewares. For example:
+
+```js
+app.use(
+  helmet({
+    referrerPolicy: { policy: "no-referrer" }
+  })
+);
+```
+
+The `contentSecurityPolicy` middleware lets you set which urls you will allow content to be loaded from, covering scripts, styles, fonts, images and more.
