@@ -365,6 +365,22 @@ If you only want one record, you can use `db.collection.findOne()`.
 
 Technically, `find` returns a cursor (a reference to the results) while `findOne` returns the document.
 
+#### Updating with Mongo
+
+Whenever you are updating a document, you are first finding it and then specifying how to update it.
+
+`db.collection.updateOne` will update the first document that matches. `db.collection.updateMany()` will update multiple documents.
+
+You need to use operators when updating. `$set` is used to replace the value of a field with a new value.
+
+For example, `db.dogs.updateOne({ name: "Charlie" }, { $set: { age: 4 } })` will update the document with the name Charlie to have an age of 4.
+
+If you use `$set` on a property that does not exist, it will be added.
+
+You can use the `$currentDate` operator to set some value to the current date. For example, `db.dogs.updateOne({ age: 6}, { $set: { age: 7}, $currentDate: { lastChanged: true } })`;
+
+`replaceOne` can be used to completely replace the contents of a document while keeping the id the same.
+
 ### Mongoose
 
 Mongoose is an ODM (Object Data Mapper / Object Document Mapper). It maps documents coming from a database into usable JavaScript objects.
