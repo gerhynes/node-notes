@@ -347,11 +347,23 @@ On Windows, enter `"C:\Program Files\MongoDB\Server\5.0\bin\mongo.exe"` into a C
 
 ### CRUD Operations
 
+#### Inserting with Mongo
+
 To insert documents into MongoDB, you insert them into a collection. If you insert into a collection that doesn't exist, it will be created.
 
 Using `db.collection.insert()` you can pass in a single document (a JavaScript object) or an array of documents. You can also use `db.collection.insertOne()` or `db.collection.insertMany()`.
 
 A unique primary key `_id` is added to every item in a collection. You can also specify an `_id`.
+
+#### Finding with Mongo
+
+To find documents in MongoDb, use `db.collection.find()`. If you pass in no arguments, it will return every document in the collection.
+
+You can pass in an object, the query, and find all documents that exactly match the value(s) passed, for example `db.dogs.find({ breed:"corgi" })`. This is case sensitive.
+
+If you only want one record, you can use `db.collection.findOne()`.
+
+Technically, `find` returns a cursor (a reference to the results) while `findOne` returns the document.
 
 ### Mongoose
 
